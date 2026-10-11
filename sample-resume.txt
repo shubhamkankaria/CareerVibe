@@ -1,0 +1,25 @@
+JANE DOE
+Senior Frontend Engineer
+jane.doe@example.com | (555) 010-2030 | San Francisco, CA
+
+SUMMARY
+Frontend engineer with 6 years of experience building React web applications,
+design systems, and performance-critical UIs. Led migration to TypeScript and
+cut bundle size by 40%.
+
+SKILLS
+JavaScript, TypeScript, React, Next.js, HTML, CSS, Tailwind, Redux, Node.js,
+REST APIs, GraphQL, Jest, Cypress, Webpack, Vite, Git, CI/CD, Figma
+
+EXPERIENCE
+Senior Frontend Engineer — Acme Corp (2021 - Present)
+- Built and maintained a React + TypeScript design system used by 8 teams.
+- Improved Lighthouse performance score from 61 to 94 via code-splitting.
+- Mentored 4 junior engineers and led code review.
+
+Frontend Engineer — StartupXYZ (2018 - 2021)
+- Shipped customer-facing dashboards in React and Redux.
+- Introduced Jest/Cypress testing, raising coverage to 70%.
+
+EDUCATION
+B.S. Computer Science — State University (2018)

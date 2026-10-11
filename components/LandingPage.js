@@ -159,12 +159,12 @@ export default function LandingPage({ isDark, T, onStart, toggleTheme, user, onS
   const [navScrolled, setNavScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [faqOpen, setFaqOpen] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [demoTab, setDemoTab] = useState(0);
   const [demoSeen, setDemoSeen] = useState(false);
   const revealRefs = useRef([]);
   const demoRef = useRef(null);
   const heroRef = useRef(null);
+  const progressRef = useRef(null);
 
   // P3-2 hero pointer parallax — desktop only, rAF-throttled, off under
   // reduced-motion and on touch. Sets --px/--py (-1..1) consumed by CSS.
@@ -188,12 +188,17 @@ export default function LandingPage({ isDark, T, onStart, toggleTheme, user, onS
     return () => { el.removeEventListener("pointermove", onMove); el.removeEventListener("pointerleave", onLeave); if (raf) cancelAnimationFrame(raf); };
   }, []);
 
-  // Scroll progress + nav elevation
+  // Scroll progress + nav elevation. The progress bar is written straight to
+  // the DOM (no state) so scrolling never re-renders the whole landing tree,
+  // and navScrolled only flips state when the boolean actually changes.
   useEffect(() => {
     const onScroll = () => {
-      setNavScrolled(window.scrollY > 24);
-      const h = document.documentElement.scrollHeight - window.innerHeight;
-      setScrollProgress(h > 0 ? (window.scrollY / h) * 100 : 0);
+      if (progressRef.current) {
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        progressRef.current.style.width = (h > 0 ? (window.scrollY / h) * 100 : 0) + "%";
+      }
+      const scrolled = window.scrollY > 24;
+      setNavScrolled((prev) => (prev === scrolled ? prev : scrolled));
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -264,7 +269,7 @@ export default function LandingPage({ isDark, T, onStart, toggleTheme, user, onS
   return (
     <div className="rv-root" data-theme={theme}>
       <div className="rv-grain" aria-hidden="true" />
-      <div className="rv-progress" style={{ width: `${scrollProgress}%` }} aria-hidden="true" />
+      <div className="rv-progress" ref={progressRef} style={{ width: "0%" }} aria-hidden="true" />
 
       {/* ── Mobile menu ─────────────────────────────────────────────── */}
       {mobileMenuOpen && (
@@ -871,8 +876,8 @@ export default function LandingPage({ isDark, T, onStart, toggleTheme, user, onS
             </div>
             <div>
               <h4 className="rv-footer-col-title">Legal</h4>
-              <span className="rv-footer-link" style={{ opacity: 0.5, cursor: "default" }}>Privacy — coming soon</span>
-              <span className="rv-footer-link" style={{ opacity: 0.5, cursor: "default" }}>Terms — coming soon</span>
+              <a href="/privacy" className="rv-footer-link">Privacy</a>
+              <a href="/terms" className="rv-footer-link">Terms</a>
             </div>
           </div>
 

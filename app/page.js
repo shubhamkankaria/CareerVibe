@@ -1648,7 +1648,7 @@ function JobCard({
                 display: "flex",
                 alignItems: "center",
                 gap: "0.5rem",
-                flexWrap: "nowrap",
+                flexWrap: "wrap",
                 marginBottom: "0.25rem",
                 minWidth: 0,
               }}
@@ -1659,11 +1659,13 @@ function JobCard({
                   fontWeight: 700,
                   fontSize: "0.9375rem",
                   color: T.text,
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
                   minWidth: 0,
                   flex: "1 1 auto",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                  overflow: "hidden",
+                  lineHeight: 1.25,
                 }}
               >
                 {job.title}
@@ -5134,9 +5136,13 @@ export default function App() {
     logActivity(`${exists ? "Unsaved" : "Saved"}: ${job.title}`);
   };
 
-  // Show loading spinner while auth is loading, or while a logged-in user's
-  // profile is still bootstrapping (W-4: prevents a landing/upload flash).
-  if (authLoading || (user && !bootstrapped)) {
+  // Only block on a logged-in user's profile bootstrap. Waiting on `authLoading`
+  // here kept the PUBLIC landing from ever server-rendering (SSR saw
+  // loading=true) and forced logged-out visitors to stare at a spinner for the
+  // whole Firebase init, which is what made the landing feel slow. A logged-in
+  // visitor may briefly see the landing before auth resolves; that is far
+  // cheaper than blocking first paint for everyone.
+  if (user && !bootstrapped) {
     return (
       <div
         style={{

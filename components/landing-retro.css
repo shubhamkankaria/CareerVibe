@@ -83,17 +83,20 @@
   border-radius: 4px;
 }
 
-/* Grain overlay for the analog paper feel */
+/* Grain overlay for the analog paper feel.
+   NOTE: no mix-blend-mode here. A fixed full-viewport layer with a blend mode
+   forces the browser to re-composite the ENTIRE page (including the hero
+   video) on every frame, which is what made scrolling the landing janky.
+   A plain low-opacity overlay gives the same paper feel far cheaper. */
 .rv-grain {
   position: fixed;
   inset: 0;
   z-index: 80;
   pointer-events: none;
-  opacity: 0.5;
-  mix-blend-mode: multiply;
+  opacity: 0.16;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
 }
-.rv-root[data-theme="dark"] .rv-grain { mix-blend-mode: screen; opacity: 0.35; }
+.rv-root[data-theme="dark"] .rv-grain { opacity: 0.12; }
 
 /* Scroll progress */
 .rv-progress {
@@ -405,23 +408,23 @@
   height: 100%;
   object-fit: cover;
   object-position: center 45%;
-  /* Slow Ken-Burns "breathing" so the shot feels alive even when idle. */
-  animation: rv-kenburns 26s ease-in-out infinite alternate;
+  /* No Ken-Burns "breathing": continuously transform-scaling a <video> forces
+     the browser to re-rasterize decoded frames every animation frame, which
+     alone cut idle FPS roughly in half. The interactive camera drift on
+     .rv-hero__footage still keeps the shot alive. */
 }
-@keyframes rv-kenburns {
-  from { transform: scale(1) translate3d(0, 0, 0); }
-  to   { transform: scale(1.06) translate3d(-1.2%, -1.6%, 0); }
-}
-/* ── Cinematic lens layers (decorative, sit above the footage) ─────────── */
+/* ── Cinematic lens layers (decorative, sit above the footage) ───────────
+   Plain alpha overlays, NOT mix-blend-mode: blend modes over a playing video
+   force an expensive per-frame composite of the whole hero stack. */
 .rv-hero__grade {
   /* Warm/teal split-tone grade. */
   background:
     linear-gradient(180deg, rgba(255,176,92,0.16) 0%, rgba(255,176,92,0.05) 34%, rgba(20,40,60,0.10) 78%, rgba(12,26,44,0.18) 100%);
-  mix-blend-mode: soft-light;
   opacity: 0.85;
 }
 .rv-hero__rays {
-  /* Volumetric god-rays drifting slowly across the frame. */
+  /* Static volumetric god-rays. The drift animation was removed: animating
+     background-position repaints the layer every frame instead of compositing. */
   background: repeating-linear-gradient(
     112deg,
     rgba(255,224,168,0) 0px,
@@ -430,25 +433,17 @@
     rgba(255,224,168,0.04) 74px,
     rgba(255,224,168,0) 96px
   );
-  mix-blend-mode: screen;
-  opacity: 0.55;
+  opacity: 0.5;
   -webkit-mask-image: radial-gradient(120% 90% at 22% 8%, #000 0%, rgba(0,0,0,0.5) 42%, transparent 78%);
   mask-image: radial-gradient(120% 90% at 22% 8%, #000 0%, rgba(0,0,0,0.5) 42%, transparent 78%);
-  animation: rv-rays-drift 18s linear infinite;
-}
-@keyframes rv-rays-drift {
-  from { background-position: 0 0; }
-  to   { background-position: 240px 0; }
 }
 .rv-hero__glow {
   /* Warm sun-glow that eases toward the pointer (vars set from JS). */
   background: radial-gradient(38% 34% at var(--rv-gx, 50%) var(--rv-gy, 34%), rgba(255,196,110,0.20) 0%, rgba(255,196,110,0.08) 42%, rgba(255,196,110,0) 72%);
-  mix-blend-mode: screen;
 }
 .rv-hero__grain {
   /* Faint film grain via inline SVG turbulence (no external asset). */
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-  mix-blend-mode: overlay;
   opacity: 0.07;
 }
 .rv-hero__vignette {

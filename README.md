@@ -184,13 +184,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## 📧 Contact
-
-**Tarun** - [@TarunTheDev](https://github.com/TarunTheDev)
-
-Project Link: [https://github.com/TarunTheDev/CareerVibe](https://github.com/TarunTheDev/CareerVibe)
-
----
 
 ## 🙏 Acknowledgments
 
